@@ -1,21 +1,37 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import DragAndDrop from "./components/DragAndDrop";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Tab, Tabs } from "react-bootstrap";
+import { v4 } from "uuid";
+import ImageView from "./components/ImageView";
 
-class App extends Component {
-  render() {
+const App = () => {
+    const [imagesRefs, setImagesRefs] = useState([]);
+    const [key, setKey] = useState("d&d");
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React/Electron</h2>
-        </div>
-        <p className="App-intro">
-          Hello Electron!
-        </p>
-      </div>
+        <Tabs id={"tabs"} activeKey={key} onSelect={setKey}>
+            <Tab title={"Add photo"} eventKey={"d&d"}>
+                <DragAndDrop
+                    onDropHandler={files =>
+                        setImagesRefs(
+                            imagesRefs.concat(
+                                files.map(f => {
+                                    f.uuid = v4();
+                                    return f;
+                                })
+                            )
+                        )
+                    }
+                />
+            </Tab>
+            {imagesRefs.map(im => (
+                <Tab title={im.name} eventKey={im.uuid} key={im.uuid}>
+                    <ImageView imageRef={im} />
+                </Tab>
+            ))}
+        </Tabs>
     );
-  }
-}
+};
 
 export default App;

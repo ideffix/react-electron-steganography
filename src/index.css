@@ -1,5 +1,36 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+.drag-and-drop {
+    width: calc(750px * 0.8);
+    height: calc(550px * 0.8);
+    border: 7px dashed #808ea4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 50px;
+}
+
+.drag-and-drop:hover {
+    cursor: pointer;
+}
+
+.cursor-on-hover:hover {
+    cursor: pointer;
+}
+
+.dnd-parent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 800px;
+    height: 600px;
+}
+
+.dragging {
+    border-color: black;
 }
