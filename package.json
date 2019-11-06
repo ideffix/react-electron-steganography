@@ -4,7 +4,7 @@
     "private": true,
     "devDependencies": {
         "electron": "^1.7.9",
-        "foreman": "^2.0.0",
+        "foreman": "^3.0.1",
         "husky": "^3.0.9",
         "prettier": "1.18.2",
         "pretty-quick": "^2.0.0",
