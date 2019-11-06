@@ -13,7 +13,7 @@ const App = () => {
         <Tabs id={"tabs"} activeKey={key} onSelect={setKey}>
             <Tab title={"Add photo"} eventKey={"d&d"}>
                 <DragAndDrop
-                    onDropHandler={files =>
+                    onDropHandler={files => {
                         setImagesRefs(
                             imagesRefs.concat(
                                 files.map(f => {
@@ -21,8 +21,8 @@ const App = () => {
                                     return f;
                                 })
                             )
-                        )
-                    }
+                        );
+                    }}
                 />
             </Tab>
             {imagesRefs.map(im => (

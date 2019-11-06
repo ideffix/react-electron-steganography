@@ -19,9 +19,9 @@ export const decryption = (byteArr, key) => {
     return aesjs.utils.utf8.fromBytes(decryptedBytes);
 };
 
-export const hideIntoImg = (imageRef, byteArr, onDataHide) => {
+export const hideIntoImg = (path, byteArr, onDataHide) => {
     readFile(
-        imageRef.path,
+        path,
         imgData => {
             const offset = writeData(
                 imgData,
@@ -33,6 +33,46 @@ export const hideIntoImg = (imageRef, byteArr, onDataHide) => {
         },
         console.error
     );
+};
+
+export const readFromImage = (path, onDataRead) => {
+    readFile(
+        path,
+        imgData => {
+            const { buffer, offset } = readData(
+                imgData,
+                START_POINT,
+                LENGTH_OF_LENGTH_BYTES
+            );
+            const length = intFromBytes(buffer);
+            const data = readData(imgData, offset, length);
+            onDataRead(data.buffer);
+        },
+        console.error
+    );
+};
+
+const readData = (imgData, offset, length) => {
+    const buffer = [];
+    let byte = "";
+    while (true) {
+        byte += read2Bites(imgData, offset);
+        if (byte.length === 8) {
+            buffer.push(parseInt(byte, 2));
+            byte = "";
+        }
+        if (buffer.length >= length) {
+            return { buffer, offset: offset + 3 };
+        }
+        offset += 3;
+    }
+};
+
+const read2Bites = (imgData, offset) => {
+    const a1 = imgData[offset] % 2;
+    const a2 = imgData[offset + 1] % 2;
+    const a3 = imgData[offset + 2] % 2;
+    return String(xor(a1, a3)) + String(xor(a2, a3));
 };
 
 const writeData = (imgData, offset, data) => {

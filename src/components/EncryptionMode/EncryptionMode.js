@@ -3,6 +3,7 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import hack from "../../images/hack.png";
 import { encryption, hideIntoImg } from "../../services/crypto-service";
 import { toBase64 } from "../../services/coding-service";
+import { writeToFile } from "../../services/file-service";
 
 const EncryptionMode = ({ imageRef }) => {
     const [afterImage, setAfterImage] = useState(null);
@@ -13,6 +14,10 @@ const EncryptionMode = ({ imageRef }) => {
             [e.target.name]: e.target.value
         });
     };
+    const handleSaveClick = () =>
+        writeToFile(form.savePath, afterImage, () =>
+            console.log("Saved!", console.error())
+        );
     return (
         <Container>
             <Form.Row>
@@ -58,7 +63,7 @@ const EncryptionMode = ({ imageRef }) => {
                     className={"d-flex align-items-center cursor-on-hover"}
                     onClick={() =>
                         hideIntoImg(
-                            imageRef,
+                            imageRef.path,
                             encryption(form.text, form.encryptionKey),
                             setAfterImage
                         )
@@ -85,6 +90,8 @@ const EncryptionMode = ({ imageRef }) => {
                         <Form.Control
                             type="text"
                             placeholder="Enter save path"
+                            name={"savePath"}
+                            onChange={updateField}
                         />
                     </Form.Group>
                 </Col>
@@ -94,7 +101,7 @@ const EncryptionMode = ({ imageRef }) => {
                         "d-flex align-items-center cursor-on-hover w-100"
                     }
                 >
-                    <Button>Save</Button>
+                    <Button onClick={handleSaveClick}>Save</Button>
                 </Col>
             </Row>
         </Container>

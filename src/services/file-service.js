@@ -1,6 +1,12 @@
 import { toBase64 } from "./coding-service";
 
-const fs = window.require("fs");
+let fs;
+
+try {
+    fs = window.require("fs");
+} catch (err) {
+    fs = require("fs");
+}
 
 export const readFile = (path, cb, errCb) => {
     fs.readFile(path, (err, data) => {
@@ -20,4 +26,14 @@ export const readFileAsBase64 = (path, cb, errCb) => {
         },
         errCb
     );
+};
+
+export const writeToFile = (path, byteArr, cb, errorCb) => {
+    fs.writeFile(path, byteArr, err => {
+        if (err) {
+            errorCb();
+        } else {
+            cb();
+        }
+    });
 };
