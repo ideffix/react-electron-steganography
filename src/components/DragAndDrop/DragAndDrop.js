@@ -1,8 +1,7 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { useDropzone } from "react-dropzone";
 
-const DragAndDrop = ({ onDropHandler }) => {
-    const onDrop = useCallback(onDropHandler, []);
+const DragAndDrop = ({ onDrop }) => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: "image/bmp"
