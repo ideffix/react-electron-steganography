@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import hack from "../../images/hack.png";
 import { encryption, hideIntoImg } from "../../services/crypto-service";
@@ -18,6 +18,9 @@ const EncryptionMode = ({ imageRef }) => {
         writeToFile(form.savePath, afterImage, () =>
             console.log("Saved!", console.error())
         );
+    const b64Img = useMemo(() => afterImage && toBase64(afterImage), [
+        afterImage
+    ]);
     return (
         <Container>
             <Form.Row>
@@ -74,9 +77,7 @@ const EncryptionMode = ({ imageRef }) => {
                 <Col xs={5}>
                     {afterImage && (
                         <img
-                            src={
-                                "data:image/bmp;base64," + toBase64(afterImage)
-                            }
+                            src={"data:image/bmp;base64," + b64Img}
                             className={"w-100"}
                             alt={"after-img"}
                         />
