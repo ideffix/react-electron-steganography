@@ -1,7 +1,8 @@
-import { sha512_256 } from "js-sha512";
+import { sha512, sha512_256 } from "js-sha512";
 import aesjs from "aes-js";
 import { readFile } from "./file-service";
 import * as _ from "lodash";
+import seedrandom from "seedrandom";
 
 const LENGTH_OF_LENGTH_BYTES = 4;
 const START_POINT = 200;
@@ -23,59 +24,57 @@ export const decryption = (byteArr, key) => {
     return aesjs.utils.utf8.fromBytes(decryptedBytes);
 };
 
-export const hideIntoImg = (path, byteArr, onDataHide) => {
+export const hideIntoImg = (path, byteArr, steganographyKey, onDataHide) => {
+    const seed = sha512.array(steganographyKey);
     readFile(
         path,
         imgData => {
-            const offset = writeData(
+            const gen = uniqueRandomInRange(seed, START_POINT, imgData.length);
+            writeData(
                 imgData,
-                START_POINT,
+                gen,
                 getInt64Bytes(byteArr.length).slice(LENGTH_OF_LENGTH_BYTES)
             );
-            writeData(imgData, offset, byteArr);
+            writeData(imgData, gen, byteArr);
             onDataHide(imgData);
         },
         console.error
     );
 };
 
-export const readFromImage = (path, onDataRead) => {
+export const readFromImage = (path, steganographyKey, onDataRead) => {
+    const seed = sha512.array(steganographyKey);
     readFile(
         path,
         imgData => {
-            const { buffer, offset } = readData(
-                imgData,
-                START_POINT,
-                LENGTH_OF_LENGTH_BYTES
-            );
+            const gen = uniqueRandomInRange(seed, START_POINT, imgData.length);
+            const buffer = readData(imgData, gen, LENGTH_OF_LENGTH_BYTES);
             const length = intFromBytes(buffer);
-            const data = readData(imgData, offset, length);
-            onDataRead(data.buffer);
+            onDataRead(readData(imgData, gen, length));
         },
         console.error
     );
 };
 
-const readData = (imgData, offset, length) => {
+const readData = (imgData, gen, length) => {
     const buffer = [];
     let excessByte = "";
     while (true) {
-        excessByte += read2Bites(imgData, offset);
+        excessByte += read2Bites(imgData, gen);
         if (excessByte.length === 8 * EXCESS_BIT_SIZE) {
             buffer.push(parseInt(readExcessByte(excessByte), 2));
             excessByte = "";
         }
-        offset += 3;
         if (buffer.length >= length) {
-            return { buffer, offset };
+            return buffer;
         }
     }
 };
 
-const read2Bites = (imgData, offset) => {
-    const a1 = imgData[offset] % 2;
-    const a2 = imgData[offset + 1] % 2;
-    const a3 = imgData[offset + 2] % 2;
+const read2Bites = (imgData, gen) => {
+    const a1 = imgData[gen.next().value] % 2;
+    const a2 = imgData[gen.next().value] % 2;
+    const a3 = imgData[gen.next().value] % 2;
     return String(xor(a1, a3)) + String(xor(a2, a3));
 };
 
@@ -94,15 +93,13 @@ const readExcessBit = excessBit => {
     return match > EXCESS_BIT_SIZE / 2 ? "1" : "0";
 };
 
-const writeData = (imgData, offset, data) => {
+const writeData = (imgData, gen, data) => {
     for (let i = 0; i < data.length; i++) {
         const bits = excessBits(decToBin(data[i]));
         for (let j = 0; j < bits.length; j += 2) {
-            write2Bits(imgData, offset, Number(bits[j]), Number(bits[j + 1]));
-            offset += 3;
+            write2Bits(imgData, gen, Number(bits[j]), Number(bits[j + 1]));
         }
     }
-    return offset;
 };
 
 const excessBits = bits =>
@@ -110,18 +107,21 @@ const excessBits = bits =>
         .map(b => (b === "1" ? EXCESS_ONE_CODE : EXCESS_ZERO_CODE))
         .join("");
 
-const write2Bits = (imgData, offset, x1, x2) => {
-    const a1 = imgData[offset] % 2;
-    const a2 = imgData[offset + 1] % 2;
-    const a3 = imgData[offset + 2] % 2;
+const write2Bits = (imgData, gen, x1, x2) => {
+    const i1 = gen.next().value;
+    const i2 = gen.next().value;
+    const i3 = gen.next().value;
+    const a1 = imgData[i1] % 2;
+    const a2 = imgData[i2] % 2;
+    const a3 = imgData[i3] % 2;
     if (xor(a1, a3) !== x1) {
         if (xor(a2, a3) === x2) {
-            imgData[offset] = imgData[offset] + resolveChange(a1);
+            imgData[i1] = imgData[i1] + resolveChange(a1);
         } else {
-            imgData[offset + 2] = imgData[offset + 2] + resolveChange(a3);
+            imgData[i3] = imgData[i3] + resolveChange(a3);
         }
     } else if (xor(a2, a3) !== x2) {
-        imgData[offset + 1] = imgData[offset + 1] + resolveChange(a2);
+        imgData[i2] = imgData[i2] + resolveChange(a2);
     }
 };
 
@@ -154,3 +154,17 @@ const decToBin = dec => {
     const bin = dec.toString(2);
     return bin.padStart(8, "0");
 };
+
+export function* uniqueRandomInRange(seed, from, to) {
+    const usedIndexes = [];
+    const rand = seedrandom(seed);
+    while (true) {
+        const index = Math.round(rand() * (to - from) + from);
+        if (usedIndexes.includes(index)) {
+            continue;
+        } else {
+            usedIndexes.push(index);
+            yield index;
+        }
+    }
+}

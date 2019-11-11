@@ -68,6 +68,7 @@ const EncryptionMode = ({ imageRef }) => {
                         hideIntoImg(
                             imageRef.path,
                             encryption(form.text, form.encryptionKey),
+                            form.steganographyKey,
                             setAfterImage
                         )
                     }

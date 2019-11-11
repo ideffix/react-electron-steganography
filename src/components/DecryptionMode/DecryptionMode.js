@@ -24,6 +24,15 @@ const DecryptionMode = ({ imageRef }) => {
                         name={"decryptionKey"}
                     />
                 </Form.Group>
+                <Form.Group as={Col}>
+                    <Form.Label>Steganography key</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter steganography key"
+                        onChange={updateField}
+                        name={"steganographyKey"}
+                    />
+                </Form.Group>
             </Form.Row>
             <Row>
                 <Col xs={10}>
@@ -37,10 +46,13 @@ const DecryptionMode = ({ imageRef }) => {
                     xs={2}
                     className={"d-flex align-items-center cursor-on-hover"}
                     onClick={() =>
-                        readFromImage(imageRef.path, byteArr =>
-                            setDecryptedMessage(
-                                decryption(byteArr, form.decryptionKey)
-                            )
+                        readFromImage(
+                            imageRef.path,
+                            form.steganographyKey,
+                            byteArr =>
+                                setDecryptedMessage(
+                                    decryption(byteArr, form.decryptionKey)
+                                )
                         )
                     }
                 >
