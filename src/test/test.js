@@ -6,7 +6,7 @@ import {
 } from "../services/crypto-service";
 import { writeToFile } from "../services/file-service";
 
-const TEXT = "z";
+const TEXT = "Message";
 const KEY = "Kluczyk";
 const TESTED_IMG_PATH = "./../images/test.bmp";
 const CREATED_IMG_PATH = "./test2.bmp";

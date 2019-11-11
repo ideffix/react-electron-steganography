@@ -20,7 +20,7 @@ const App = () => {
         );
     };
     return (
-        <Tab id={"tabs"} activeKey={key} onSelect={setKey}>
+        <Tabs id={"tabs"} activeKey={key} onSelect={setKey}>
             <Tab title={"Add photo"} eventKey={"d&d"}>
                 <DragAndDrop onDrop={onDropHandle} />
             </Tab>
@@ -29,7 +29,7 @@ const App = () => {
                     <ImageView imageRef={im} />
                 </Tab>
             ))}
-        </Tab>
+        </Tabs>
     );
 };
 
