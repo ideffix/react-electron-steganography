@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import seedrandom from "seedrandom";
 
 const LENGTH_OF_LENGTH_BYTES = 4;
-const START_POINT = 200;
+export const START_POINT = 200;
 const EXCESS_ONE_CODE = "11010";
 const EXCESS_ZERO_CODE = "00101";
 const EXCESS_BIT_SIZE = 5;
