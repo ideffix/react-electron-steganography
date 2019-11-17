@@ -2,6 +2,7 @@ import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import React, { useState } from "react";
 import EncryptionMode from "../EncryptionMode";
 import DecryptionMode from "../DecryptionMode";
+import NoiseMode from "../NoiseMode";
 
 const ImageView = ({ imageRef }) => {
     const [mode, setMode] = useState("encryption");
@@ -29,14 +30,19 @@ const ImageView = ({ imageRef }) => {
                     >
                         Decryption
                     </ToggleButton>
+                    <ToggleButton type="radio" name="radio" value={"noise"}>
+                        Noise
+                    </ToggleButton>
                 </ToggleButtonGroup>
             </div>
             <div>
-                {mode === "encryption" ? (
+                {mode === "encryption" && (
                     <EncryptionMode imageRef={imageRef} />
-                ) : (
+                )}
+                {mode === "decryption" && (
                     <DecryptionMode imageRef={imageRef} />
                 )}
+                {mode === "noise" && <NoiseMode imageRef={imageRef} />}
             </div>
         </div>
     );
